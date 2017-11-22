@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
 <body>
-	<h1>上传视频（不带token）</h1>
+	<h1>上传视频（带token）</h1>
 	<div class="f-clearfix">
 
     <input  type="file" id="fileinput" />
@@ -51,9 +51,8 @@ var opt = {
 	                //headers参数为API token校验返回的结果，全部均为必须
 	                headers: {
 	                    'AppKey': config.appKey,   //开发者平台分配的appkey
-	                    'Nonce': config.nonce,    //随机数（随机数，最大长度128个字符）
-	                    'CurTime': config.curTime,  //当前UTC时间戳，从1970年1月1日0点0分0秒开始到现在的秒数
-	                    'CheckSum': config.checkSum
+	                    'Accid': "32",    //随机数（随机数，最大长度128个字符）
+	                    'Token': "75ecb11c5f6a94c19162b8cdf1971521f4c2c2a7",  //当前UTC时间戳，从1970年1月1日0点0分0秒开始到现在的秒数
 	                },
 	                dataType: 'json',
 	                contentType: 'application/json',
