@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+	<div class="f-clearfix">
+
+    <input  type="file" id="fileinput" />
+    <input  type="button" id="submitBtn" value="上传视频">
+	</div>
+
+</body>
+<script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="https://blueimp.github.io/JavaScript-MD5/js/md5.js"></script>
+<script type="text/javascript" src="http://nos.netease.com/vod163/upload.js"></script>
+<script src="//cdn.bootcss.com/js-sha1/0.3.0/sha1.js"></script>
+<script type="text/javascript">
+
+var config = {
+    appKey: '',
+    nonce: '',
+    curTime:'',
+    checkSum:'',
+    trunkSize: 4 * 1024 * 1024
+};
+
+var opt = {
+    fileInputId: 'fileinput',
+    fileUploadId: 'submitBtn',
+    getInitInfo: function(file, callback) {
+            var context;
+            context = localStorage.getItem(file.fileKey + '_context');
+            //?
+            if (!context) {
+            	console.log("context:"+context);
+	            $.ajax({
+	            	type: 'post',
+	                url: 'http://vcloud.163.com/app/vod/upload/init',
+	                data: JSON.stringify({
+	                    originFileName: file.file.name,     //上传文件的原始名称(包含后缀名)(必填)(规则同Windows文件名规则)
+	                    userFileName: file.file.name,       //用户命名的上传文件名称(规则同Windows文件名规则)
+	                    typeId: "144045",                       //视频所属的类别ID
+	                    presetId: null,                     //视频所需转码模板ID
+	                    callbackUrl: null,                  //转码成功后回调客户端的URL地址
+	                    description: "我是描述信息"          //上传视频的描述信息
+	                }),
+	                //headers参数为API token校验返回的结果，全部均为必须
+	                headers: {
+	                    'AppKey': config.appKey,   //开发者平台分配的appkey
+	                    'Nonce': config.nonce,    //随机数（随机数，最大长度128个字符）
+	                    'CurTime': config.curTime,  //当前UTC时间戳，从1970年1月1日0点0分0秒开始到现在的秒数
+	                    'CheckSum': config.checkSum
+	                },
+	                dataType: 'json',
+	                contentType: 'application/json',
+	                success: function(data, s, xhr) {
+	                    if (data.code === 200) {
+	                            localStorage.setItem(file.fileKey + '_bucket', data.ret.bucket);
+	                            localStorage.setItem(file.fileKey + '_object', data.ret.object);
+	                            localStorage.setItem(file.fileKey + '_xNosToken', data.ret.xNosToken);
+	                        callback({
+	                            'bucketName': data.ret.bucket,
+	                            'objectName': data.ret.object,
+	                            'nosToken': data.ret.xNosToken
+	                        });
+	                    } else {
+	                        opt.onError({
+	                            errCode: data.Code,
+	                            errMsg: data.msg
+	                        });
+	                    }
+	                },
+	                error: function(xhr, s, err) {
+	                    opt.onError(err);
+	                }
+	            });
+            } else {
+                callback({
+                    'bucketName': localStorage.getItem(file.fileKey + '_bucket'),
+                    'objectName': localStorage.getItem(file.fileKey + '_object'),
+                    'nosToken': localStorage.getItem(file.fileKey + '_xNosToken')
+                });
+            }
+        },
+		onError: function(errObj) {
+            console.log(JSON.stringify(errObj));
+        },
+
+        onProgress: function(curFile) {
+            console.log(curFile.status);
+            console.log(curFile.progress);
+        },
+
+        onUploaded: function(curFile) {
+            console.log('File: ' + curFile.fileName + ' is uploaded.');
+            // 将文件信息存入上传成功列表
+            // 将文件信息存入上传成功列表
+            uploadRecord(curFile);
+        },
+
+        onAllUploaded: function() {
+            console.log('All done.');
+        },
+
+        onAdd: function(curFile) {
+            console.log(curFile.file.name + ': ' + curFile.fileSizeMb + ' MB');
+        },
+
+        noUploadFn: function() {
+            console.log('请选择待上传的文件');
+        },
+
+        existFn: function() {
+            console.log('文件已存在列表中');
+        },
+        mismatchFn: function() {
+            $('#progressInfo').html('不是有效的视频或图片格式');
+        }
+}
+
+Uploader(opt).init();
+
+$.ajax({
+	type:"post",
+	url:"/video/getAuth",
+	dataType:"json",
+	success:function(data){
+		console.log(JSON.stringify(data));
+		if(data.code==200){
+			config.appKey=data.data.appKey;
+			config.nonce=data.data.nonce;
+			config.curTime=data.data.curTime;
+			config.checkSum=data.data.checkSum;
+		}else{
+			alert("获取权限信息失败");
+		}
+	}
+});
+
+
+//文件上传后将文件信息记录到后端数据库
+function uploadRecord(fileInfo){
+    $.ajax({
+        type:"post",
+        url:"http://localhost/video/recordUpload",
+        data:{"fileInfo":JSON.stringify(fileInfo)},
+        dataType:"json",
+        success:function(data){
+            console.log(JSON.stringify(data));
+        }
+    });
+}
+
+</script>
+</html>
