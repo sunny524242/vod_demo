@@ -22,9 +22,8 @@
 
 var config = {
     appKey: '',
-    nonce: '',
-    curTime:'',
-    checkSum:'',
+    accid: '',
+    token:'',
     trunkSize: 4 * 1024 * 1024
 };
 
@@ -51,8 +50,8 @@ var opt = {
 	                //headers参数为API token校验返回的结果，全部均为必须
 	                headers: {
 	                    'AppKey': config.appKey,   //开发者平台分配的appkey
-	                    'Accid': "32",    //随机数（随机数，最大长度128个字符）
-	                    'Token': "75ecb11c5f6a94c19162b8cdf1971521f4c2c2a7",  //当前UTC时间戳，从1970年1月1日0点0分0秒开始到现在的秒数
+	                    'Accid': config.accid,
+	                    'Token': config.token,
 	                },
 	                dataType: 'json',
 	                contentType: 'application/json',
@@ -125,17 +124,16 @@ Uploader(opt).init();
 
 $.ajax({
 	type:"post",
-	url:"/video/getAuth",
+	url:"/video/getVodUser",
 	dataType:"json",
 	success:function(data){
 		console.log(JSON.stringify(data));
 		if(data.code==200){
 			config.appKey=data.data.appKey;
-			config.nonce=data.data.nonce;
-			config.curTime=data.data.curTime;
-			config.checkSum=data.data.checkSum;
+			config.accid=data.data.accid;
+			config.token=data.data.token;
 		}else{
-			alert("获取权限信息失败");
+			alert("获取视频终端用户信息失败");
 		}
 	}
 });

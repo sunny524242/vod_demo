@@ -1,16 +1,21 @@
 package com.example.vod_demo.dto;
 
 public class VodUser {
-    private String id;
+    //视频终端用户id
+    private String accid;
+    //视频终端用户姓名
     private String name;
-    private String status;
+    //视频终端用户属性
+    private String props;
+    //视频终端用户token
+    private String token;
 
-    public String getId() {
-        return id;
+    public String getAccid() {
+        return accid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAccid(String accid) {
+        this.accid = accid;
     }
 
     public String getName() {
@@ -21,11 +26,19 @@ public class VodUser {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status;
+    public String getProps() {
+        return props;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setProps(String props) {
+        this.props = props;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

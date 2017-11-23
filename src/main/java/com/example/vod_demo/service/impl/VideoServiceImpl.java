@@ -6,7 +6,6 @@ import com.example.vod_demo.dto.VideoInfo;
 import com.example.vod_demo.dto.VodUser;
 import com.example.vod_demo.service.VideoService;
 import com.example.vod_demo.util.CheckSumBuilder;
-import com.example.vod_demo.vo.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -28,7 +27,7 @@ public class VideoServiceImpl implements VideoService{
 
 
     /**
-     * 获取视频读写权限
+     * 获取视频读写权限(非token方式)
      * @return
      */
     @Override
@@ -43,6 +42,8 @@ public class VideoServiceImpl implements VideoService{
         auth.put("checkSum",CheckSumBuilder.getCheckSum(appSecret,nonce,curTime));
         return auth;
     }
+
+    
 
     /**
      * 记录上传的视频信息
@@ -68,8 +69,117 @@ public class VideoServiceImpl implements VideoService{
     }
 
 
+    /**
+     * 创建终端用户
+     * @param vodUser
+     * @return
+     */
     @Override
-    public JsonResult createUser(VodUser vodUser) {
+    public VodUser createUser(VodUser vodUser) {
+        HttpHeaders headers = getHeaders();
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("accid",vodUser.getAccid());
+        params.put("name",vodUser.getName());
+        params.put("type","1");
+        params.put("props","test");
+        HttpEntity<String> stringHttpEntity = new HttpEntity<String>(JSON.toJSONString(params),headers);
+
+        ResponseEntity<String> exchange = restTemplate.exchange("http://vcloud.163.com//app/vod/thirdpart/user/create",
+                HttpMethod.POST, stringHttpEntity, String.class);
+        JSONObject userJO = JSON.parseObject(exchange.getBody());
+        if ("200".equals(userJO.getString("code"))){
+            vodUser.setToken(userJO.getJSONObject("ret").getString("token"));
+            return vodUser;
+        }else{
+            return null;
+        }
+    }
+
+
+    /**
+     * 屏蔽终端用户
+     * @param vodUser 传入id即可
+     * @return
+     */
+    @Override
+    public boolean disableUser(VodUser vodUser) {
+        HttpHeaders headers = getHeaders();
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("accid",vodUser.getAccid());
+
+        HttpEntity<String> stringHttpEntity = new HttpEntity<String>(JSON.toJSONString(params),headers);
+
+        ResponseEntity<String> exchange = restTemplate.exchange("http://vcloud.163.com//app/vod/thirdpart/user/userDisable",
+                HttpMethod.POST, stringHttpEntity, String.class);
+        JSONObject userJO = JSON.parseObject(exchange.getBody());
+        if ("200".equals(userJO.getString("code"))){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+    /**
+     * 恢复终端用户
+     * @param vodUser 传入id即可
+     * @return
+     */
+    @Override
+    public boolean recoverUser(VodUser vodUser) {
+        HttpHeaders headers = getHeaders();
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("accid",vodUser.getAccid());
+
+        HttpEntity<String> stringHttpEntity = new HttpEntity<String>(JSON.toJSONString(params),headers);
+
+        ResponseEntity<String> exchange = restTemplate.exchange("http://vcloud.163.com//app/vod/thirdpart/user/userRecover",
+                HttpMethod.POST, stringHttpEntity, String.class);
+        JSONObject userJO = JSON.parseObject(exchange.getBody());
+        if ("200".equals(userJO.getString("code"))){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 删除终端用户
+     * @param vodUser 传入id即可
+     * @return
+     */
+    @Override
+    public boolean deleteUser(VodUser vodUser) {
+        HttpHeaders headers = getHeaders();
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("accid",vodUser.getAccid());
+
+        HttpEntity<String> stringHttpEntity = new HttpEntity<String>(JSON.toJSONString(params),headers);
+
+        ResponseEntity<String> exchange = restTemplate.exchange("http://vcloud.163.com//app/vod/thirdpart/user/userDelete",
+                HttpMethod.POST, stringHttpEntity, String.class);
+        JSONObject userJO = JSON.parseObject(exchange.getBody());
+        if ("200".equals(userJO.getString("code"))){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+    private String getNonce(){
+        return String.valueOf(Math.round(Math.random() * Math.pow(10, 16)));
+    }
+
+    private String getCurTime(){
+        return String.valueOf(System.currentTimeMillis());
+    }
+
+    private HttpHeaders getHeaders(){
         HttpHeaders headers = new HttpHeaders();
         headers.add("appKey",appKey);
         String nonce = getNonce();
@@ -79,26 +189,7 @@ public class VideoServiceImpl implements VideoService{
         headers.add("checkSum",CheckSumBuilder.getCheckSum(appSecret, nonce,curTime));
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
-
-        HashMap<String, String> params = new HashMap<>();
-        params.put("accid",vodUser.getId());
-        params.put("name",vodUser.getName());
-        params.put("type","1");
-        params.put("props","test");
-        HttpEntity<String> stringHttpEntity = new HttpEntity<String>(JSON.toJSONString(params),headers);
-
-        ResponseEntity<String> exchange = restTemplate.exchange("http://vcloud.163.com//app/vod/thirdpart/user/create", HttpMethod.POST, stringHttpEntity, String.class);
-        System.out.println("\n\nresp:"+exchange.getBody());
-
-        return null;
-    }
-    
-    private String getNonce(){
-        return String.valueOf(Math.round(Math.random() * Math.pow(10, 16)));
-    }
-
-    private String getCurTime(){
-        return String.valueOf(System.currentTimeMillis());
+        return headers;
     }
 
 }

@@ -24,7 +24,26 @@ public interface VideoService {
      * 创建网易云用户
      * @return
      */
-    public JsonResult createUser(VodUser vodUser);
+    VodUser createUser(VodUser vodUser);
 
+    /**
+     * 屏蔽终端用户
+     * @param vodUser 传入id即可
+     * @return
+     */
+    boolean disableUser(VodUser vodUser);
 
+    /**
+     * 恢复终端用户
+     * @param vodUser 传入id即可
+     * @return
+     */
+    boolean recoverUser(VodUser vodUser);
+
+    /**
+     * 删除终端用户
+     * @param vodUser 传入id即可
+     * @return
+     */
+    boolean deleteUser(VodUser vodUser);
 }
