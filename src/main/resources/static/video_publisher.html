@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<div id="my-publisher"></div>
+
+		<script src="./js/nePublisher.min.js"></script>
+
+		<script>
+			var myPublisher = new nePublisher(
+				'my-publisher', // String 必选 推流器容器id
+				{ // Object 可选 推流初始化videoOptions参数
+					videoWidth: 640, // Number 可选 推流分辨率 宽度 default 640
+					videoHeight: 480, // Number 可选 推流分辨率 高度 default 480
+					fps: 20, // Number 可选 推流帧率 default 15
+					bitrate: 600, // Number 可选 推流码率 default 600
+					video: true, // Boolean 可选 是否推流视频 default true
+					audio: true // Boolean 可选 是否推流音频 default true
+				}, { // Object 可选 推流初始化flashOptions参数
+					previewWindowWidth: 862, // Number 可选 预览窗口宽度 default 862
+					previewWindowHeight: 486, // Number 可选 预览窗口高度 default 446
+					wmode: 'opaque', // String 可选 flash显示模式 window opaque
+					quality: 'high', // String 可选 flash质量 default high
+					allowScriptAccess: 'always' // String 可选 flash跨域允许 default always
+				},
+				function() {
+					//function 可选 初始化成功的回调函数
+					//可在该回调中调用getCameraList和getMicroPhoneList方法获取 摄像头和麦克风列表
+					cameraList = this.getCameraList();
+					microPhoneList = this.getMicroPhoneList();
+					console.log(JSON.stringify("cameraList:"+cameraList));
+					console.log(JSON.stringify("microPhoneList:"+microPhoneList));
+					console.log("开始预览");
+					myPublisher.startPreview(0);
+					console.log("结束预览")
+					myPublisher.stopPreview();
+					console.log("开始发布");
+					startPublish();
+					
+					setTimeout(function(){
+						myPublisher.stopPublish();
+						myPublisher.release();
+					},300000)
+					
+					
+				},
+				function(code, desc) {
+					console.log("初始化出错");
+					console.log("code:"+code);
+					console.log("desc:"+desc);
+				}
+			);
+
+			function startPublish(){
+				myPublisher.startPublish(
+				'rtmp://pb9300344.live.126.net/live/308665bb075749a6b6e2b23d18f03332?wsSecret=bb9bbd6b0dc9ddf3b4777509cd28d930&wsTime=1511492918', // String 必选 要推流的频道地址
+				function(code, desc) {
+					console.log("发布出错");
+					console.log("code:"+code);
+					console.log("desc:"+desc);
+				});
+			}
+
+			
+		</script>
+	</body>
+
+</html>
