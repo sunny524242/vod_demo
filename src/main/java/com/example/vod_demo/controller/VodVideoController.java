@@ -1,8 +1,5 @@
 package com.example.vod_demo.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.example.vod_demo.dto.VodUser;
 import com.example.vod_demo.service.VideoService;
 import com.example.vod_demo.vo.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,7 @@
 package com.example.vod_demo.service;
 
 import com.alibaba.fastjson.JSON;
+import com.example.vod_demo.dto.VideoInfo;
 import com.example.vod_demo.dto.VodUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,18 @@ public class VideoTests {
 
 		b = videoService.deleteUser(vodUser);
 		assert b :"用户删除失败";
+	}
+
+
+	/**
+	 * 测试获取视频VID
+	 */
+	@Test
+	public void getVideoInfoVidTest(){
+		VideoInfo videoInfo = new VideoInfo();
+		videoInfo.setObjectName("02089593-5130-481b-aac4-f7b25a7143d2.mp4");
+		videoInfo = videoService.getVideoVID(videoInfo);
+		assert videoInfo.getVid()!=null : "获取视频VID失败";
 	}
 
 }

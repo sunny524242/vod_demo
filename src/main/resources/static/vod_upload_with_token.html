@@ -94,17 +94,19 @@ var opt = {
         },
 
         onUploaded: function(curFile) {
+        	console.log("curFile:"+JSON.stringify(curFile));
             console.log('File: ' + curFile.fileName + ' is uploaded.');
-            // 将文件信息存入上传成功列表
             // 将文件信息存入上传成功列表
             uploadRecord(curFile);
         },
 
-        onAllUploaded: function() {
+        onAllUploaded: function(obj) {
+            console.log("onAllUploaded:"+JSON.stringify(obj));
             console.log('All done.');
         },
 
         onAdd: function(curFile) {
+            console.log("onAdd:"+JSON.stringify(curFile));
             console.log(curFile.file.name + ': ' + curFile.fileSizeMb + ' MB');
         },
 
