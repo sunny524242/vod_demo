@@ -2,6 +2,7 @@ package com.example.vod_demo.service;
 
 import com.alibaba.fastjson.JSON;
 import com.example.vod_demo.dto.VideoInfo;
+import com.example.vod_demo.dto.VodChannel;
 import com.example.vod_demo.dto.VodUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,17 @@ public class VideoTests {
 		assert b :"用户删除失败";
 	}
 
+	/**
+	 * 测试直播频道的增删改等
+	 */
+	@Test
+	public void channelOperationTest() {
+		VodChannel vodChannel = new VodChannel();
+		String channelName = UUID.randomUUID().toString().replace("-", "");
+		videoService.createChannel(channelName,"0");
+		//待完成
+
+	}
 
 	/**
 	 * 测试获取视频VID

@@ -13,7 +13,6 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.xml.bind.SchemaOutputResolver;
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -49,7 +48,7 @@ public class VideoServiceImpl implements VideoService{
     
 
     /**
-     * 记录上传的视频信息
+     * 记录网易接口上传完后回调的视频信息
      * @param fileInfo
      * @return
      */
@@ -98,8 +97,12 @@ public class VideoServiceImpl implements VideoService{
         }
     }
 
-    //根据视频名称获取视频唯一标识VID（网易云视频接口没有在上传回调中传回此ID）
-    //http://dev.netease.im/docs/product/%E7%82%B9%E6%92%AD/%E6%9C%8D%E5%8A%A1%E7%AB%AFAPI%E6%96%87%E6%A1%A3?pos=toc-5-4
+
+    /**
+     * 获取视频详情
+     * @param videoInfo 传入vid即可
+     * @return 详情信息放置在返回的videoInfo对象中
+     */
     public VideoInfo getVideoDetail(VideoInfo videoInfo){
         HttpHeaders headers = getHeaders();
         HashMap<String, Object> params = new HashMap<>();
@@ -122,15 +125,15 @@ public class VideoServiceImpl implements VideoService{
 
     /**
      * 添加视频播放凭证（回源鉴权）
-     * @param videoInfo
+     * @param videoInfo 传入vid和过期时间
      * resId:	标识需要设置播放凭证的资源，构造规则是：
      * appKey + "_" + vid + "_" + style（其中style为视频格式：
      * 0标识源视频、1标识流畅mp4、2标识标清mp4、3标识高清mp4、
      * 4标识流畅flv、5标识标清flv、6标识高清flv、7标识流畅hls、8标识标清hls、
      * 9标识高清hls），
-     *
+     * @return 新的token放置在返回的videoInfo对象中
      */
-    public VideoInfo getVideoAuth(VideoInfo videoInfo){
+    public VideoInfo addVideoAuth(VideoInfo videoInfo){
         HttpHeaders headers = getHeaders();
         HashMap<String, String> params = new HashMap<>();
         params.put("resId",appKey+"_"+videoInfo.getVid()+"_"+0);
@@ -149,6 +152,12 @@ public class VideoServiceImpl implements VideoService{
         }
     }
 
+
+    /**
+     * 更新视频权限信息
+     * @param videoInfo 传入vid 和过期时间
+     * @return 新的token放置在返回的videoInfo对象中
+     */
     public VideoInfo updateVideoAuth(VideoInfo videoInfo){
         HttpHeaders headers = getHeaders();
         HashMap<String, String> params = new HashMap<>();

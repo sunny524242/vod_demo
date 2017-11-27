@@ -22,12 +22,25 @@ public interface VideoService {
      */
     boolean recordUploadVideo(String fileInfo);
 
+
     /**
-     * 获取视频VID
+     * 添加视频播放凭证（回源鉴权）
+     * @param videoInfo 传入vid和过期时间
+     * resId:	标识需要设置播放凭证的资源，构造规则是：
+     * appKey + "_" + vid + "_" + style（其中style为视频格式：
+     * 0标识源视频、1标识流畅mp4、2标识标清mp4、3标识高清mp4、
+     * 4标识流畅flv、5标识标清flv、6标识高清flv、7标识流畅hls、8标识标清hls、
+     * 9标识高清hls），
+     * @return 新的token放置在返回的videoInfo对象中
+     */
+    VideoInfo addVideoAuth(VideoInfo videoInfo);
+
+    /**
+     * 根据文件对象名称获取文件vid
      * @param videoInfo
      * @return
      */
-    VideoInfo getVideoVID(VideoInfo videoInfo);
+     VideoInfo getVideoVID(VideoInfo videoInfo);
 
     /**
      * 创建网易云用户
@@ -55,6 +68,9 @@ public interface VideoService {
      * @return
      */
     boolean deleteUser(VodUser vodUser);
+
+
+
 
     /**
      * 创建频道
